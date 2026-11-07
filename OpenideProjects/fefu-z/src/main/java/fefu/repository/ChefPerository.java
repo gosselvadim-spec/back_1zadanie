@@ -23,4 +23,7 @@ public class ChefPerository{
     public List<Chef> findAll() {
         return new ArrayList<>(chefs.values());
     }
+    public void deletebyId(String id) {
+        chefs.remove(id);
+    }
 }

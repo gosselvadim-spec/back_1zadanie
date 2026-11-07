@@ -24,4 +24,7 @@ public class DishRepository {
     public List<Dishes> findAll() {
         return new ArrayList<>(dishes.values());
     }
+    public void deletebyId(String id) {
+        dishes.remove(id);
+    }
 }
