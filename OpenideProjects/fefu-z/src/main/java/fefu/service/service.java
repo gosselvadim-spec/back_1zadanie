@@ -37,8 +37,7 @@ public class Service {
     }
 
     public Dishes cook(String dishId) {
-        Dishes dish = dishRepository.findById(dishId)
-                .orElseThrow(() -> new IllegalArgumentException("Блюдо не найдено"));
+        Dishes dish = dishRepository.findById(dishId).orElseThrow(() -> new IllegalArgumentException("Блюдо не найдено"));
 
         if (!"CREATED".equals(dish.status)) {
             throw new IllegalArgumentException("Блюдо уже готовится или подано");
