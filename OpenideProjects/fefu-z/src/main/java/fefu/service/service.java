@@ -4,19 +4,18 @@ import fefu.Models.Chef;
 import fefu.Models.Dishes;
 import fefu.repository.ChefPerository;
 import fefu.repository.DishRepository;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-@Service
-public class service {
+@org.springframework.stereotype.Service
+public class Service {
 
     private final ChefPerository chefRepository;
     private final DishRepository dishRepository;
 
-    public service(ChefPerository chefRepository, DishRepository dishRepository) {
+    public Service(ChefPerository chefRepository, DishRepository dishRepository) {
         this.chefRepository = chefRepository;
         this.dishRepository = dishRepository;
     }
@@ -45,8 +44,7 @@ public class service {
             throw new IllegalArgumentException("Блюдо уже готовится или подано");
         }
 
-        Chef chef = chefRepository.findbyId(dish.chefId)
-                .orElseThrow(() -> new IllegalArgumentException("Повар не найден"));
+        Chef chef = chefRepository.findbyId(dish.chefId).orElseThrow(() -> new IllegalArgumentException("Повар не найден"));
 
         int activeCount = 0;
         for (String id : chef.activeDishes) {
