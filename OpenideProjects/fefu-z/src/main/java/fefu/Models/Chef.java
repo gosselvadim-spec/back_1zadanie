@@ -1,4 +1,4 @@
-package fefu;
+package fefu.Models;
 
 import java.util.ArrayList;
 
@@ -12,7 +12,6 @@ public class Chef {
         this.Id = Id;
         this.name = name;
         this.type = type;
-        this.activeDishes = activeDishes;
     }
 
 
