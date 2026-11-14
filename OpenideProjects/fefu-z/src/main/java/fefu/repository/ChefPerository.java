@@ -10,20 +10,24 @@ import java.util.List;
 import java.util.ArrayList;
 
 @Repository
-public class ChefPerository{
+public class ChefPerository {
     private final Map<String, Chef> chefs = new HashMap<>();
 
-    public Chef save(Chef chef){
-        chefs.put(chef.Id,chef);
+    public Chef save(Chef chef) {
+        chefs.put(chef.id, chef);
         return chef;
     }
-    public Optional<Chef> findbyId(String Id){
-        return Optional.ofNullable(chefs.get(Id));
+
+    public Optional<Chef> findById(String id) {
+        return Optional.ofNullable(chefs.get(id));
     }
+
     public List<Chef> findAll() {
         return new ArrayList<>(chefs.values());
     }
-    public void deletebyId(String id) {
+
+    public void deleteById(String id)
+    {
         chefs.remove(id);
     }
 }

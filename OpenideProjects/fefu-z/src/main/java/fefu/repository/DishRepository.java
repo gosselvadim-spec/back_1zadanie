@@ -11,12 +11,13 @@ import java.util.ArrayList;
 
 @Repository
 public class DishRepository {
-    private final Map<String,Dishes> dishes = new HashMap<>();
+    private final Map<String, Dishes> dishes = new HashMap<>();
 
-    public Dishes save(Dishes dish){
-        dishes.put(dish.Id, dish);
+    public Dishes save(Dishes dish) {
+        dishes.put(dish.id, dish);
         return dish;
     }
+
     public Optional<Dishes> findById(String id) {
         return Optional.ofNullable(dishes.get(id));
     }
@@ -24,7 +25,9 @@ public class DishRepository {
     public List<Dishes> findAll() {
         return new ArrayList<>(dishes.values());
     }
-    public void deletebyId(String id) {
+
+    public void deleteById(String id)
+    {
         dishes.remove(id);
     }
 }

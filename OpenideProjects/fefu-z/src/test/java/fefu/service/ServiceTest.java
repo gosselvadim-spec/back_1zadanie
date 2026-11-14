@@ -26,7 +26,7 @@ class ServiceTest {
     private DishRepository dishRepository;
 
     @InjectMocks
-    private Service service;
+    private KitchenService service;
 
     @Test
     void createChefSuccess() {
@@ -70,7 +70,7 @@ class ServiceTest {
         activeDish.status = "COOKING";
 
         when(dishRepository.findById("123")).thenReturn(Optional.of(dish));
-        when(chefRepository.findbyId("1")).thenReturn(Optional.of(chef));
+        when(chefRepository.findById("1")).thenReturn(Optional.of(chef));
         when(dishRepository.findById("a1")).thenReturn(Optional.of(activeDish));
         when(dishRepository.findById("a2")).thenReturn(Optional.of(activeDish));
         when(dishRepository.findById("a3")).thenReturn(Optional.of(activeDish));
@@ -87,7 +87,7 @@ class ServiceTest {
         Dishes dish = new Dishes("123", "Борщ", "1");
 
         when(dishRepository.findById("123")).thenReturn(Optional.of(dish));
-        when(chefRepository.findbyId("1")).thenReturn(Optional.of(chef));
+        when(chefRepository.findById("1")).thenReturn(Optional.of(chef));
 
         Dishes result = service.cook("123");
 

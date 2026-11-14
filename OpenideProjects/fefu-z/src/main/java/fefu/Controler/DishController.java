@@ -1,7 +1,7 @@
 package fefu.Controler;
 
 import fefu.Models.Dishes;
-import fefu.service.Service;
+import fefu.service.KitchenService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -9,12 +9,12 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 @RestController
-@RequestMapping("/dishs")
+@RequestMapping("/dishes")
 
 public class DishController {
-    private final Service kitchenService;
+    private final KitchenService kitchenService;
 
-    public DishController(Service kitchenService) {
+    public DishController(KitchenService kitchenService) {
         this.kitchenService = kitchenService;
     }
     @PostMapping
