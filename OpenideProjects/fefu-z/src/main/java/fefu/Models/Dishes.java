@@ -1,4 +1,4 @@
-package fefu;
+package fefu.Models;
 
 public class Dishes {
     public String id;
