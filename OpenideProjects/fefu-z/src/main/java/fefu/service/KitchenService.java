@@ -5,6 +5,7 @@ import fefu.Models.Dishes;
 import fefu.repository.ChefPerository;
 import fefu.repository.DishRepository;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -100,6 +101,11 @@ public class KitchenService {
         dishRepository.deleteById(id);
     }
 
+    public Dishes getDishById(String id) {
+        return dishRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Блюдо не найдено"));
+    }
+
     public Chef getChefById(String id) {
         return chefRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Повар не найден"));
@@ -108,6 +114,12 @@ public class KitchenService {
     public void deleteChef(String id) {
         chefRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Повар не найден"));
+
+        List<Dishes> allDishes = dishRepository.findAll();
+        boolean hasDishes = allDishes.stream().anyMatch(dish -> id.equals(dish.chefId));
+        if (hasDishes) {
+            throw new IllegalStateException("Нельзя удалить повара, у него есть блюда");
+        }
         chefRepository.deleteById(id);
     }
 }

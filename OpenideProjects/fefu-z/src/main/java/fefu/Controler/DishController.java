@@ -8,15 +8,16 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+
 @RestController
 @RequestMapping("/dishes")
-
 public class DishController {
     private final KitchenService kitchenService;
 
     public DishController(KitchenService kitchenService) {
         this.kitchenService = kitchenService;
     }
+
     @PostMapping
     public ResponseEntity<Dishes> createDish(@RequestBody Map<String,String> body){
         Dishes dish = kitchenService.createDish(body.get("name"),body.get("chefId"));
@@ -33,6 +34,11 @@ public class DishController {
         return kitchenService.getDishes(status);
     }
 
+    @GetMapping("/{id}")
+    public Dishes getDishById(@PathVariable String id) {
+        return kitchenService.getDishById(id);
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<Map<String, String>> updateDish(@PathVariable String id, @RequestBody Map<String, String> body) {
         kitchenService.updateDish(id, body.get("name"));
@@ -44,5 +50,4 @@ public class DishController {
         kitchenService.deleteDish(id);
         return ResponseEntity.noContent().build();
     }
-
 }
