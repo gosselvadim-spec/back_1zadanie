@@ -1,0 +1,13 @@
+CREATE TABLE chefs (
+    id VARCHAR(255) PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    type VARCHAR(50) NOT NULL
+);
+
+CREATE TABLE dishes (
+    id VARCHAR(255) PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    status VARCHAR(50) NOT NULL,
+    chef_id VARCHAR(255),
+    CONSTRAINT fk_chef FOREIGN KEY (chef_id) REFERENCES chefs(id) ON DELETE RESTRICT
+);
