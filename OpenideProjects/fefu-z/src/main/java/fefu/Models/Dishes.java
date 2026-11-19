@@ -1,15 +1,34 @@
 package fefu.Models;
 
-public class Dishes {
-    public String id;
-    public String name;
-    public String status;
-    public String chefId;
+import jakarta.persistence.*;
 
-    public Dishes(String id, String name, String chefId) {
+@Entity
+@Table(name = "dishes")
+public class Dishes {
+    @Id
+    private String id;
+    private String name;
+    private String status;
+
+    @ManyToOne
+    @JoinColumn(name = "chef_id")
+    private Chef chef;
+
+    public Dishes() {}
+
+    public Dishes(String id, String name, Chef chef) {
         this.id = id;
         this.name = name;
-        this.chefId = chefId;
+        this.chef = chef;
         this.status = "CREATED";
     }
+
+    public String getId() { return id; }
+    public void setId(String id) { this.id = id; }
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
+    public Chef getChef() { return chef; }
+    public void setChef(Chef chef) { this.chef = chef; }
 }
