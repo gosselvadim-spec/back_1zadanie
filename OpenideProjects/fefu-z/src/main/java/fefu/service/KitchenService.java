@@ -5,6 +5,7 @@ import fefu.Models.Dishes;
 import fefu.repository.ChefPerository;
 import fefu.repository.DishRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -30,39 +31,37 @@ public class KitchenService {
     }
 
     public Dishes createDish(String name, String chefId) {
-        if (chefRepository.findById(chefId).isEmpty()) {
-            throw new IllegalArgumentException("Повар не найден");
-        }
-        Dishes dish = new Dishes(UUID.randomUUID().toString(), name, chefId);
+        Chef chef = chefRepository.findById(chefId)
+                .orElseThrow(() -> new IllegalArgumentException("Повар не найден"));
+
+        Dishes dish = new Dishes(UUID.randomUUID().toString(), name, chef);
         return dishRepository.save(dish);
     }
 
+    @Transactional
     public Dishes cook(String dishId) {
         Dishes dish = dishRepository.findById(dishId)
                 .orElseThrow(() -> new IllegalArgumentException("Блюдо не найдено"));
 
-        if (!"CREATED".equals(dish.status)) {
+        if (!"CREATED".equals(dish.getStatus())) {
             throw new IllegalArgumentException("Блюдо уже готовится или подано");
         }
 
-        Chef chef = chefRepository.findById(dish.chefId)
-                .orElseThrow(() -> new IllegalArgumentException("Повар не найден"));
+        Chef chef = dish.getChef();
 
         int activeCount = 0;
-        for (String id : chef.activeDishes) {
-            Optional<Dishes> d = dishRepository.findById(id);
-            if (d.isPresent() && "COOKING".equals(d.get().status)) {
+        for (Dishes d : chef.getActiveDishes()) {
+            if ("COOKING".equals(d.getStatus())) {
                 activeCount++;
             }
         }
 
-        int limit = "ulti".equals(chef.type) ? 10 : 3;
+        int limit = "ulti".equals(chef.getType()) ? 10 : 3;
         if (activeCount >= limit) {
             throw new IllegalStateException("Повар перегружен");
         }
 
-        dish.status = "COOKING";
-        chef.activeDishes.add(dishId);
+        dish.setStatus("COOKING");
         dishRepository.save(dish);
         return dish;
     }
@@ -70,7 +69,7 @@ public class KitchenService {
     public List<Chef> getChefs(String typeFilter) {
         List<Chef> result = chefRepository.findAll();
         if (typeFilter != null) {
-            result.removeIf(c -> !typeFilter.equals(c.type));
+            result.removeIf(c -> !typeFilter.equals(c.getType()));
         }
         return result;
     }
@@ -78,7 +77,7 @@ public class KitchenService {
     public List<Dishes> getDishes(String statusFilter) {
         List<Dishes> result = dishRepository.findAll();
         if (statusFilter != null) {
-            result.removeIf(d -> !statusFilter.equals(d.status));
+            result.removeIf(d -> !statusFilter.equals(d.getStatus()));
         }
         return result;
     }
@@ -87,7 +86,7 @@ public class KitchenService {
         Dishes dish = dishRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Блюдо не найдено"));
         if (newName != null) {
-            dish.name = newName;
+            dish.setName(newName);
             dishRepository.save(dish);
         }
     }
@@ -95,8 +94,8 @@ public class KitchenService {
     public void deleteDish(String id) {
         Dishes dish = dishRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Блюдо не найдено"));
-        if (!"CREATED".equals(dish.status)) {
-            throw new IllegalStateException("Можно удалять только блюда в статусе CREATED");
+        if (!"CREATED".equals(dish.getStatus())) {
+            throw new IllegalStateException("Можно удалить только блюда в статусе CREATED");
         }
         dishRepository.deleteById(id);
     }
@@ -112,14 +111,13 @@ public class KitchenService {
     }
 
     public void deleteChef(String id) {
-        chefRepository.findById(id)
+        Chef chef = chefRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Повар не найден"));
 
-        List<Dishes> allDishes = dishRepository.findAll();
-        boolean hasDishes = allDishes.stream().anyMatch(dish -> id.equals(dish.chefId));
-        if (hasDishes) {
+        if (!chef.getActiveDishes().isEmpty()) {
             throw new IllegalStateException("Нельзя удалить повара, у него есть блюда");
         }
+
         chefRepository.deleteById(id);
     }
 }
