@@ -1,6 +1,7 @@
 package fefu.Models;
 
 import jakarta.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "dishes")
@@ -9,6 +10,8 @@ public class Dishes {
     private String id;
     private String name;
     private String status;
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
 
     @ManyToOne
     @JoinColumn(name = "chef_id")
@@ -21,6 +24,7 @@ public class Dishes {
         this.name = name;
         this.chef = chef;
         this.status = "CREATED";
+        this.createdAt = LocalDateTime.now();
     }
 
     public String getId() { return id; }
@@ -31,4 +35,6 @@ public class Dishes {
     public void setStatus(String status) { this.status = status; }
     public Chef getChef() { return chef; }
     public void setChef(Chef chef) { this.chef = chef; }
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 }

@@ -120,4 +120,17 @@ public class KitchenService {
 
         chefRepository.deleteById(id);
     }
+
+    @Transactional
+    public Dishes transferDishToAnotherChef(String dishId, String newChefId) {
+        Dishes dish = dishRepository.findById(dishId)
+                .orElseThrow(() -> new IllegalArgumentException("Блюдо не найдено"));
+
+        Chef newChef = chefRepository.findById(newChefId)
+                .orElseThrow(() -> new IllegalArgumentException("Новый повар не найден"));
+
+        dish.setChef(newChef);
+
+        return dishRepository.save(dish);
+    }
 }
