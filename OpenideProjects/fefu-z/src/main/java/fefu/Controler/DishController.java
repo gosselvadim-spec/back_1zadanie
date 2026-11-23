@@ -12,6 +12,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/dishes")
 public class DishController {
+
     private final KitchenService kitchenService;
 
     public DishController(KitchenService kitchenService) {
@@ -19,8 +20,8 @@ public class DishController {
     }
 
     @PostMapping
-    public ResponseEntity<Dishes> createDish(@RequestBody Map<String,String> body){
-        Dishes dish = kitchenService.createDish(body.get("name"),body.get("chefId"));
+    public ResponseEntity<Dishes> createDish(@RequestBody Map<String, String> body) {
+        Dishes dish = kitchenService.createDish(body.get("name"), body.get("chefId"));
         return ResponseEntity.status(HttpStatus.CREATED).body(dish);
     }
 
@@ -49,5 +50,10 @@ public class DishController {
     public ResponseEntity<Void> deleteDish(@PathVariable String id) {
         kitchenService.deleteDish(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/{id}/transfer/{newChefId}")
+    public Dishes transferDish(@PathVariable String id, @PathVariable String newChefId) {
+        return kitchenService.transferDishToAnotherChef(id, newChefId);
     }
 }
