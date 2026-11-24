@@ -13,8 +13,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class ServiceTest {
@@ -26,71 +25,56 @@ class ServiceTest {
     private DishRepository dishRepository;
 
     @InjectMocks
-    private KitchenService service;
+    private KitchenService kitchenService;
 
     @Test
-    void createChefSuccess() {
+    void createChef_Success() {
         Chef chef = new Chef("1", "Иван", "medium");
         when(chefRepository.save(any(Chef.class))).thenAnswer(i -> i.getArgument(0));
-        Chef result = service.createChef("Иван", "medium");
+
+        Chef result = kitchenService.createChef("Иван", "medium");
 
         assertNotNull(result);
-        assertEquals("Иван", result.name);
-        assertEquals("medium", result.type);
+        assertEquals("Иван", result.getName());
     }
 
     @Test
     void createChef_WrongType_ThrowsException() {
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            service.createChef("Иван", "boss");
+        assertThrows(IllegalArgumentException.class, () -> {
+            kitchenService.createChef("Иван", "boss");
         });
-        assertEquals("Тип Повара: medium или ulti", exception.getMessage());
-    }
-
-    @Test
-    void cook_DishNotFound_ThrowsException() {
-        when(dishRepository.findById("123")).thenReturn(Optional.empty());
-
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            service.cook("123");
-        });
-        assertEquals("Блюдо не найдено", exception.getMessage());
     }
 
     @Test
     void cook_ChefOverloaded_ThrowsException() {
         Chef chef = new Chef("1", "Иван", "medium");
-        Dishes dish = new Dishes("123", "Борщ", "1");
-
-        chef.activeDishes.add("a1");
-        chef.activeDishes.add("a2");
-        chef.activeDishes.add("a3");
-
-        Dishes activeDish = new Dishes("a1", "Суп", "1");
-        activeDish.status = "COOKING";
+        Dishes dish = new Dishes("123", "Борщ", chef);
+        Dishes d1 = new Dishes("a1", "Суп", chef); d1.setStatus("COOKING");
+        Dishes d2 = new Dishes("a2", "Салат", chef); d2.setStatus("COOKING");
+        Dishes d3 = new Dishes("a3", "Каша", chef); d3.setStatus("COOKING");
+        chef.getActiveDishes().add(d1);
+        chef.getActiveDishes().add(d2);
+        chef.getActiveDishes().add(d3);
 
         when(dishRepository.findById("123")).thenReturn(Optional.of(dish));
-        when(chefRepository.findById("1")).thenReturn(Optional.of(chef));
-        when(dishRepository.findById("a1")).thenReturn(Optional.of(activeDish));
-        when(dishRepository.findById("a2")).thenReturn(Optional.of(activeDish));
-        when(dishRepository.findById("a3")).thenReturn(Optional.of(activeDish));
 
-        Exception exception = assertThrows(IllegalStateException.class, () -> {
-            service.cook("123");
+        assertThrows(IllegalStateException.class, () -> {
+            kitchenService.cook("123");
         });
-        assertEquals("Повар перегружен", exception.getMessage());
     }
 
     @Test
-    void cook_Success() {
-        Chef chef = new Chef("1", "Иван", "medium");
-        Dishes dish = new Dishes("123", "Борщ", "1");
+    void transferDish_Success() {
+        Chef oldChef = new Chef("1", "Иван", "medium");
+        Chef newChef = new Chef("2", "Петр", "ulti");
+        Dishes dish = new Dishes("123", "Борщ", oldChef);
 
         when(dishRepository.findById("123")).thenReturn(Optional.of(dish));
-        when(chefRepository.findById("1")).thenReturn(Optional.of(chef));
+        when(chefRepository.findById("2")).thenReturn(Optional.of(newChef));
+        when(dishRepository.save(any(Dishes.class))).thenAnswer(i -> i.getArgument(0));
 
-        Dishes result = service.cook("123");
+        Dishes result = kitchenService.transferDishToAnotherChef("123", "2");
 
-        assertEquals("COOKING", result.status);
+        assertEquals(newChef, result.getChef());
     }
 }

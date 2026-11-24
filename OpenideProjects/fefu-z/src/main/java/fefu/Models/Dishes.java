@@ -2,6 +2,7 @@ package fefu.Models;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "dishes")
@@ -15,6 +16,7 @@ public class Dishes {
 
     @ManyToOne
     @JoinColumn(name = "chef_id")
+    @JsonIgnore
     private Chef chef;
 
     public Dishes() {}
